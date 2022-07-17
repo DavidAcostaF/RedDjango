@@ -1,0 +1,233 @@
+{% extends 'base.html' %}
+{% load static %}
+{%block extra_css%}
+<link rel="stylesheet" href="{%static 'css/style.css'%}">
+{%endblock extra_css%}
+
+{%block info%}
+{%if usuario.portada %}
+<div class="d-flex justify-content-center">
+    <img src="{{usuario.portada.url}}" style="width: 50vw; height: 300px;">
+</div>
+<br>
+<!-- <div class="card bg-dark text-white">
+    <img src="{{usuario.portada.url}}" class="card-img" alt="..." style="width: 70vw; height: 500px;" >
+    <div class="card-img-overlay">
+      <h5 class="card-title">Card title</h5>
+      <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+      <p class="card-text">Last updated 3 mins ago</p>
+    </div>
+  </div> -->
+{% else %}
+<div class="d-flex justify-content-center">
+    <img src="https://josefacchin.com/wp-content/uploads/2020/02/como-quitar-el-fondo-de-una-imagen.png"
+        style="width: 70vw; height: 500px;">
+</div>
+{%endif%}
+{%endblock info%}
+
+{%block body%}
+{%if usuario == request.user%}
+{%else%}
+{%if amigos%}
+<div>
+    <form action="" method="post">{%csrf_token%}
+        <button type="submit" class="btn btn-danger">No Seguir</button>
+    </form>
+</div>
+{%else%}
+<div>
+    <form action="" method="post">{%csrf_token%}
+        <button type="submit" class="btn btn-success">Seguir Usuario</button>
+    </form>
+</div>
+{%endif%}
+{%endif%}
+{%if usuario == request.user%}
+<div class="container"><img
+        src="{%if usuario.image %}{{usuario.image.url}}{% else %}{%static 'img/default.png'%}{%endif%}"
+        style="height:35px;width: 35px; border-radius: 15px; margin-left: 32.9%;">
+    <button class="joinBtn" hx-get="{% url 'posts:crear_posts' %}" hx-target="#dialog">Crear
+        Publicacion</button>
+</div><br>
+{%endif%}
+<div class="d-flex justify-content-left">
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">Fotos</h5>
+            {%for publicacion in object_list%}
+            {%if publicacion.imagen %}
+            <img src="{{publicacion.imagen.url}}" style="width:150px ;height:150px; border:1px black solid">
+            {%endif%}
+            {%endfor%}
+        </div>
+    </div>
+</div>
+<!-- CREAR PUBLICACIONES -->
+<!-- <div class="card">
+    <div class="card-header">
+        <div class="row">
+            <strong class="card-title">Crear Posts</strong>
+            <div class="col-md-4">
+                <button type="button" class="btn btn-primary" hx-get="{% url 'posts:crear_posts' %}"
+                    hx-target="#dialog">REGISTRAR LIBRO</button>
+            </div>
+        </div>
+    </div>
+</div>
+<br> -->
+
+{%for publicacion in object_list%}
+
+<div class="d-flex justify-content-center " style="position:relative; bottom:70px; right: 30px; margin-bottom: 20px;">
+    <div class="card" style="width: 34rem;">
+        <div class="card-body">
+            <h5 class="card-title"><a
+                href="{%url 'usuarios:muro' publicacion.usuario.first_name publicacion.usuario.last_name%}"><img
+                    src="{%if publicacion.usuario.image %}{{publicacion.usuario.image.url}}{% else %}{%static 'img/default.png'%}{%endif%}"
+                    style="height:35px;width: 35px; border-radius: 15px;"></a><a
+                href="{%url 'usuarios:muro' publicacion.usuario.first_name publicacion.usuario.last_name %}">{{publicacion.usuario.first_name}}
+                {{publicacion.usuario.last_name}}</a> <label>{{publicacion.fecha_creacion|date:"d F Y"}}
+                </label><label style="position: relative; left: 200px;">
+                    <div class="dropdown">
+                        <button class="" type="button" id="dropdown1" data-toggle="dropdown" aria-label="Close"
+                            style="font-size: 25px; border: none; background: transparent;">...</button>
+                        <div class="dropdown-menu">
+                            {% if publicacion.usuario == request.user%}
+                            
+                            {% if publicacion.shared_body%}
+                            <button class="dropdown-item" hx-get="{% url 'posts:editar_compartido' publicacion.id%}"
+                            hx-target="#dialog">Editar</button>
+                            {%else%}
+                                <button class="dropdown-item" hx-get="{% url 'posts:editar_post' publicacion.id%}"
+                                hx-target="#dialog">Editar</button>
+                            {% endif %}
+                            <button class=" dropdown-item" hx-post="{% url 'posts:eliminar_post' publicacion.id%}"
+                                hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>Eliminar</button>
+                            {% endif %}
+                            <button class="dropdown-item" hx-post="{% url 'posts:guardar_post' publicacion.id%}"
+                                hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>Guardar Post</button>
+                            <a class="dropdown-item" hx-get="{% url 'posts:compartir_post' publicacion.id%}"
+                                hx-target="#dialog">Compartir Post</a>
+                        </div>
+                    </div>
+            </h5>
+            <br>
+            <p class=>
+                {% if publicacion.shared_post%}
+                {{publicacion.shared_body}}
+                {% else %}
+                {{publicacion.contenido}}
+                {% endif %}</p>
+            {%if publicacion.shared_post.imagen%}<img src="{{publicacion.shared_post.imagen.url}}"
+                style="height:500px ; width: 500px;">{%else %}
+                
+                {% if publicacion.imagen %}
+                <img src="{{publicacion.imagen.url}}"
+                style="height:500px ; width: 500px;">
+                {% endif %}
+                    
+        {%endif%}
+            {%if publicacion.shared_user%}
+            <!-- {%if publicacion.imagen%}
+            <img src="{{publicacion.imagen.url}}" style="height:500px ; width: 500px;">
+            {%endif%} -->
+            <label>Publicacion compartida de </label>
+            {{publicacion.shared_post.usuario}}</a> <label> el {{publicacion.shared_post.fecha_creacion|date:"d F Y"}}
+            </label>
+            <br>
+            {{publicacion.shared_post.contenido}}
+            {%endif%}
+            <!-- <p class="card-text">With supporting text below as a natural lead-in to additional content.</p> -->
+        </div>
+        <div class="debajo">
+            <div class="seccion1">
+                <div class=""><label id="likes_{{publicacion.id}}">{{publicacion.like.count}}</label> Likes</div>
+                <div class=""><label id="dislikes_{{publicacion.id}}">{{publicacion.dislike.count}}</label> Dislikes
+                </div>
+                <div class="">Comentarios</div>
+                <div class="">{{publicacion.veces_compartidos}} Veces Compartido</div>
+            </div>
+            <div class="seccion2">
+                <form action="{%url 'posts:like' publicacion.id%}" method="post"> {% csrf_token %}<i
+                        class="fa-solid fa-thumbs-up"></i><button type="submit" class="si"
+                        id="like_{{publicacion.id}}"
+                        style="{%for like in publicacion.like.all%}{%if like == request.user %}background:blue; color:white;{%endif%}{%endfor%}"
+                        onclick="AddLike({{publicacion.id}})">Like</button></form>
+                <form action="{%url 'posts:dislike' publicacion.id%}" method="post"> {% csrf_token %}<i
+                        class="fa-solid fa-thumbs-down"></i><button type="submit" class="si"
+                        id="dislike_{{publicacion.id}}"
+                        style="{%for dislike in publicacion.dislike.all%}{%if dislike == request.user %}background:red; color:white;{%endif%}{%endfor%}"
+                        onclick="AddDislike({{publicacion.id}})">Dislike</button></form>
+                <button class="si">Comentar</button>
+                <button class="si" hx-get="{% url 'posts:compartir_post' publicacion.id%}"
+                hx-target="#dialog">Compartir</button>
+            </div>
+        </div>
+            <!-- <p class="card-text">With supporting text below as a natural lead-in to additional content.</p> -->
+        </div>
+    </div>
+</div>
+<br>
+
+{%endfor %}
+
+{%endblock body%}
+
+{%block extrajs%}
+<script>
+    function AddLike(likesCount) {
+        countLikes = document.getElementById(`likes_${likesCount}`)
+        count = Number(countLikes.textContent)
+        like = document.getElementById(`like_${likesCount}`)
+
+        dislike = document.getElementById(`dislike_${likesCount}`)
+        countDislikes = document.getElementById(`dislikes_${likesCount}`)
+        counts = Number(countDislikes.textContent)
+        if (like.style.background == 'blue') {
+            like.style.background = ""
+            like.style.color = ""
+            countLikes.innerHTML = + count - 1
+        } else {
+            like.style.background = "blue"
+            like.style.color = "white"
+            dislike.style.background = ""
+            dislike.style.color = ""
+            countLikes.innerHTML = count + 1
+            if (countDislikes.textContent == 0) {
+                countDislikes.innerHTML = counts
+            } else {
+                countDislikes.innerHTML = + counts - 1
+            }
+        }
+    }
+
+    function AddDislike(dislikeCount) {
+        countDislikes = document.getElementById(`dislikes_${dislikeCount}`)
+        count = Number(countDislikes.textContent)
+        dislike = document.getElementById(`dislike_${dislikeCount}`)
+
+        like = document.getElementById(`like_${dislikeCount}`)
+
+        countLikes = document.getElementById(`likes_${dislikeCount}`)
+        counts = Number(countLikes.textContent)
+        if (dislike.style.background == 'red') {
+            dislike.style.background = ""
+            dislike.style.color = ""
+            countDislikes.innerHTML = + count - 1
+        } else {
+            dislike.style.background = "red"
+            dislike.style.color = "white"
+            like.style.background = ""
+            like.style.color = ""
+            countDislikes.innerHTML = + 1
+            if (countLikes.textContent == 0) {
+                countLikes.innerHTML = counts
+            } else {
+                countLikes.innerHTML = counts - 1
+            }
+        }
+    }
+</script>
+{%endblock extrajs%}

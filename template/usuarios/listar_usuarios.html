@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{%load static%}
+{%block title%}
+Usuarios disponibles
+{%endblock title%}
+{%block info%}Usuarios disponibles{%endblock info%}
+{%block body%}
+
+{%for usuario in usuarios%}
+<div class="card" style="width: 20rem;">
+    <div class="card-body">
+        <h5 class="card-title"><img
+                src="{%if usuario.image %}{{usuario.image.url}}{% else %}{%static 'img/default.png'%}{%endif%}"
+                style="height:35px;width: 35px; border-radius: 15px;">{{usuario.first_name}} {{usuario.last_name}}</h5>
+        <br>
+        <!-- <p class="card-text">With supporting text below as a natural lead-in to additional content.</p> -->
+        <a href="{%url 'usuarios:muro' usuario.first_name usuario.last_name %}" class="btn btn-primary">Ver usuario</a>
+    </div>
+</div>
+{%endfor %}
+{%endblock body%}

@@ -1,0 +1,61 @@
+.joinBtn {
+    width: 30.4rem;
+    height: 5ex;
+    /* background-color: F; */
+    border: 2px solid ;
+    border-radius: 10px;
+    font-weight: bold;
+    color: black;
+    cursor: pointer;
+}
+
+.joinBtn:hover {
+    background-color: #0a02fc;
+    color: white;
+}
+
+/* .debajo{
+    border: 1px solid #000;
+} */
+
+.seccion1{
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-gap: 10px;
+    margin-left: 25px;
+    margin-right: 20px;
+    word-spacing: 2px;
+    border-bottom: 3px solid #000;
+    font-size: medium;
+}
+
+.seccion2{
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-gap: 10px;
+    margin-top: 5px;
+    word-spacing: 2px;
+    font-size: medium;
+}
+
+.si{
+    border: none;
+    background-color: transparent;
+    border-radius: 5px;
+}
+
+.si:hover {
+    background-color: rgb(130, 127, 127);
+    color: white;
+}
+
+a{
+    text-decoration: none;
+    color: #000;
+}
+
+.comentario{
+    width: auto;
+    margin-bottom: 15px;
+
+}

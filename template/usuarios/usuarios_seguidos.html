@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{%block title%}
+Usuarios Seguidos
+{%endblock title%}
+{%block body%}
+
+{%for amigo in object_list%}
+
+<div class="card" style="width: 20rem;">
+    <div class="card-body">
+        <h5 class="card-title"><img
+                src="{%if amigo.image %}{{amigo.image.url}}{% else %}{%static 'img/default.png'%}{%endif%}"
+                style="height:35px;width: 35px; border-radius: 15px;">{{amigo.first_name}} {{amigo.last_name}}</h5>
+        <br>
+        <!-- <p class="card-text">With supporting text below as a natural lead-in to additional content.</p> -->
+        <a href="{%url 'usuarios:muro' amigo.first_name amigo.last_name %}" class="btn btn-primary">Ver usuario</a>
+    </div>
+</div>
+
+{%endfor %}
+
+{%endblock body%}
