@@ -6,6 +6,7 @@ from django.views.generic import TemplateView,CreateView,FormView,ListView,Updat
 from itertools import chain
 from django.core.serializers import serialize
 from django.db.models import Q
+from django.core.paginator import Paginator
 
 
 from . import models
@@ -30,10 +31,13 @@ class Inicio(LoginYSuperStaffMixins,ValidarPermisosMixins,ListView):
         self_posts = user.post_set.all()
         publicaciones = self.model.objects.filter(usuario__in = amigos)
         result_list = list(chain(publicaciones, self_posts))
-        comentarios = models.PostComentarios.objects.filter(post__in = result_list)
+        
+        paginator = Paginator(result_list,10)
+        page = request.GET.get('page')
+        result_list = paginator.get_page(page)
+        #comentarios = models.PostComentarios.objects.filter(post__in = result_list)
         ##no se agrega por que no tiene relacion con el post el cual es con el que se filtra
-        return render(request,self.template_name,{'object_list':result_list,
-        'comentarios':comentarios}) 
+        return render(request,self.template_name,{'object_list':result_list}) 
 
 
 class Posts(LoginYSuperStaffMixins,ValidarPermisosMixins,CreateView):

@@ -7,26 +7,13 @@
 {% csrf_token %}
 {%block body%}
 
-
-<!-- <div class="card">
-    <div class="card-header">
-        <div class="row">
-            <strong class="card-title">Crear Posts</strong>
-            <div class="col-md-4">
-                <button type="button" class="btn btn-primary" hx-get="{% url 'posts:crear_posts' %}"
-                    hx-target="#dialog">REGISTRAR LIBRO</button>
-            </div>
-        </div>
-    </div>
-</div>
-<br> -->
 <div class="container"><a href="{%url 'usuarios:muro' request.user.first_name request.user.last_name%}"><img
             src="{{request.user.image.url}}"
             style="height:35px;width: 35px; border-radius: 15px; margin-left: 34.7%;"></a>
     <button class="joinBtn" hx-get="{% url 'posts:crear_posts' %}" hx-target="#dialog">Crear
         Publicacion</button>
 </div><br>
-
+{%if object_list%}
 {%for publicacion in object_list%}
 <div class="d-flex justify-content-center">
     <div style="align-items: center; justify-content: center">
@@ -77,9 +64,7 @@
                 {% if publicacion.shared_post.imagen %}
                 <img src="{{publicacion.shared_post.imagen.url}}" style="height:500px ; width: 500px;">{%endif%}
                 {%if publicacion.shared_post%}
-                <!-- {%if publicacion.imagen%}
-                <img src="{{publicacion.imagen.url}}" style="height:500px ; width: 500px;">
-                {%endif%} -->
+
                 <label>Publicacion compartida de </label>
                 {{publicacion.shared_post.usuario}} </a><label> el {{publicacion.shared_post.fecha_creacion|date:"d F Y"}}
                 </label>
@@ -118,49 +103,35 @@
                     </form>
                 <div class="comentarios" id="comentarios_{{publicacion.id}}" style="display:none;">
                     </div>
-                    {% comment %}
-                    {%for comentario in comentarios%}
-                    
-                    {% if comentario.post == publicacion %}
-                    <div class="comentario" style="white-space: nowrap; display: inline-block; ">
-                        <img src="{{comentario.usuario.image.url}}" style="height:35px;width: 35px; border-radius: 15px;float: left;">
-                        <div style="border: 1px solid #000;border-radius:10px; width: auto; height: auto; max-width: 540px; margin-left: 37px;">
-                            <span >{{comentario.usuario}} 
-                            </span><br>
-                            <span>{{comentario.comentario}}</span>
-                        </div>
-                        <form action="{%url 'posts:like_comentario' comentario.id%}" method="post" style="width: 40px; margin: 0;">{% csrf_token %} <button type="submit" style="margin-left: px;font-size: 10px;">Me gusta</button></form>
-                        <button style="font-size: 10px;" onclick="responder({{comentario.id}})">Contestar</button>
-                    </div><br>
-                    
-                    <form action="{%url 'posts:contestar' comentario.id%}" method="post" style="display: none;" id="comentario_{{comentario.id}}">{% csrf_token %}<img src="{{request.user.image.url}}" style="height:25px;width: 25px; border-radius: 15px;"><input type="text" name="comentario" placeholder="responder a {{comentario.usuario}}..." class="form-control" style="width: 200px;height: 30px;display:inline-block;border-radius:15px"></form><br>
-                        {% if comentario.post ==  comentario%}
-                        <div class="comentario" style="white-space: nowrap; display: inline-block; ">
-                            <img src="{{comentario.usuario.image.url}}" style="height:35px;width: 35px; border-radius: 15px;float: left;">
-                            <div style="border: 1px solid #000;border-radius:10px; width: auto; height: auto; max-width: 540px; margin-left: 37px;">
-                                <span >{{comentario.usuario}} 
-                                </span><br>
-                                <span>{{comentario.comentario}}</span>
-                            </div>
-                            <!-- <form action="{%url 'posts:like_comentario' comentario.id%}" method="post" style="width: 40px; margin: 0;">{% csrf_token %} <button type="submit" style="margin-left: px;font-size: 10px;">Me gusta</button></form> -->
-                            <button style="font-size: 10px;" onclick="responder({{comentario.id}})">Contestar</button>
-                        </div><br>
-                        <!-- <form action="{%url 'posts:contestar' comentario.id%}" method="post" style="display: none;" id="comentario_{{comentario.id}}">{% csrf_token %}<img src="{{request.user.image.url}}" style="height:25px;width: 25px; border-radius: 15px;"><input type="text" name="comentario" placeholder="responder a {{comentario.usuario}}..." class="form-control" style="width: 200px;height: 30px;display:inline-block;border-radius:15px"></form><br> -->
-                        {% endif %}
-                        {% endif %}
-                    <!-- contestado -->
-                        
-                    {%endfor%} {% endcomment %}
-                {% comment %} </div> {% endcomment %}
             </div>
         </div>
         <br>
     </div>
 </div>
+
 {%endfor %}
+{% else %}
+<h1>Crea un post o sigue un usuario</h1>
+{% endif%}
+
+<div style="" class="d-flex justify-content-center">
+    <div>
+        {% if object_list.has_previous%}
+        <div class='clearfix'>
+            <a href='?page={{object_list.previus_page_number}}' class='btn btn-success'>Anterior</a>
+        </div>
+        {% endif%}
+        </div>
+        <div>
+        {% if object_list.has_next%}
+        <div class='clearfix'>
+            <a href='?page={{ object_list.next_page_number}}{{object_list.previus_page_number}}' class='btn btn-success'>Siguiente</a>
+        </div>
+        {% endif%}
+        </div>
+    </div>
 
 {%endblock body%}
-
 
 {%block extrajs%}
 <script src="{%static 'js/index.js'%}"></script>

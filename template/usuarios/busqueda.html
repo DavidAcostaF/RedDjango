@@ -4,7 +4,11 @@
 Busqueda Usuarios
 {%endblock title%}
 {%block info%}Busqueda Usuarios{%endblock info%}
+{%block value%}
+{{request.GET.usuario}} 
+{%endblock value%}
 {%block body%}
+
 
 {%for usuario in usuarios%}
 <div class="card" style="width: 20rem;">
