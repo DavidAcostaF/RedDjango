@@ -34,25 +34,29 @@
             <div class="card-body">
                 <h5 class="card-title"><a
                         href="{%if publicacion.shared_user %}{%url 'usuarios:muro' publicacion.shared_user.first_name publicacion.shared_user.last_name%}{%else%} {%url 'usuarios:muro' publicacion.usuario.first_name publicacion.usuario.last_name %}{%endif%}">
-
                         <img src="{{publicacion.usuario.image.url}}"
                             style="height:35px;width: 35px; border-radius: 15px;"></a><a
-                        href="{%if publicacion.shared_user %}{%url 'usuarios:muro' publicacion.shared_user.first_name publicacion.shared_user.last_name%}{%else%} {%url 'usuarios:muro' publicacion.usuario.first_name publicacion.usuario.last_name %}{%endif%}">
-                        {% if publicacion.shared_user%}
-                        {{publicacion.shared_user}}
+                        href="{%if publicacion.shared_post %}{%url 'usuarios:muro' publicacion.usuario.first_name publicacion.usuario.last_name%}{%else%} {%url 'usuarios:muro' publicacion.usuario.first_name publicacion.usuario.last_name %}{%endif%}">
+                        {% if publicacion.shared_post%}
+                        {{publicacion.usuario}}
                         {% else %}
                         {{publicacion.usuario.first_name}}
                         {{publicacion.usuario.last_name}}
                         {% endif %}
                     </a> <label>{{publicacion.fecha_creacion|date:"d F Y"}}
-                    </label><label style="position: relative; left: 200px;">
+                    </label><label style="float:right;">
                         <div class="dropdown">
                             <button class="" type="button" id="dropdown1" data-toggle="dropdown" aria-label="Close"
                                 style="font-size: 25px; border: none; background: transparent;">...</button>
                             <div class="dropdown-menu">
                                 {% if publicacion.usuario == request.user%}
-                                <button class="dropdown-item" hx-get="{% url 'posts:editar_post' publicacion.id%}"
+                                {% if publicacion.shared_post%}
+                                <button class="dropdown-item" hx-get="{% url 'posts:editar_compartido' publicacion.id%}"
+                                hx-target="#dialog">Editar</button>
+                                {%else%}
+                                    <button class="dropdown-item" hx-get="{% url 'posts:editar_post' publicacion.id%}"
                                     hx-target="#dialog">Editar</button>
+                                {% endif %}
                                 <button class=" dropdown-item" hx-post="{% url 'posts:eliminar_post' publicacion.id%}"
                                     hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>Eliminar</button>
                                 {% endif %}
@@ -67,18 +71,17 @@
                 <p class=>
                     {{publicacion.contenido}}
                 </p>
-                {%if publicacion.shared_post.imagen%}<img src="{{publicacion.shared_post.imagen.url}}"
-                    style="height:500px ; width: 500px;">{%else %}
-                {% if publicacion.imagen %}
-                <img src="{{publicacion.imagen.url}}" style="height:500px ; width: 500px;">{%endif%}
-                {% endif %}
-                {%if publicacion.shared_user%}
+                {%if publicacion.imagen%}<img src="{{publicacion.imagen.url}}"
+                    style="height:500px ; width: 500px;">
+                {%endif%}
+                {% if publicacion.shared_post.imagen %}
+                <img src="{{publicacion.shared_post.imagen.url}}" style="height:500px ; width: 500px;">{%endif%}
+                {%if publicacion.shared_post%}
                 <!-- {%if publicacion.imagen%}
                 <img src="{{publicacion.imagen.url}}" style="height:500px ; width: 500px;">
                 {%endif%} -->
                 <label>Publicacion compartida de </label>
-                {{publicacion.shared_post.usuario}}</a> <label> el {{publicacion.shared_post.fecha_creacion|date:"d F
-                    Y"}}
+                {{publicacion.shared_post.usuario}} </a><label> el {{publicacion.shared_post.fecha_creacion|date:"d F Y"}}
                 </label>
                 <br>
                 {{publicacion.shared_post.contenido}}
@@ -105,17 +108,17 @@
                             id="dislike_{{publicacion.id}}"
                             style="{% if request.user in publicacion.dislike.all %}background:red; color:white;{%endif%}"
                             onclick="AddDislike({{publicacion.id}})">Dislike</button></form>
-                    <button class="si" onclick="mostrarComentarios({{publicacion.id}})">Comentar</button>
+                    <button class="si" {% comment %} onclick="mostrarComentarios({{publicacion.id}})"{% endcomment %} onclick="comentarios({{publicacion.id}})">Comentar</button> 
                     <button class="si" hx-get="{% url 'posts:compartir_post' publicacion.id%}"
                         hx-target="#dialog">Compartir</button>
                 </div>
-                <div class="comentarios" id="comentarios_{{publicacion.id}}" style="display:none;">
-                    <form action="{%url 'posts:comentar' publicacion.id%}" method="post" style="display:inline-block;margin-bottom: 10px;"> {% csrf_token %}<img src="{{request.user.image.url}}" style="height:35px;width: 35px; border-radius: 15px;"><input
-                            style="width: 500px;display:inline-block;border-radius:15px " type="text" class="form-control" name="comentario"
-                            placeholder="Escribe un comentario público...">
-                            <!-- <button type="submit"class="btn btn-default">Enviar</button> -->
+                    <form action="{%url 'posts:comentar' publicacion.id%}" method="post" id="comentar_{{publicacion.id}}" style="display:none;margin-bottom: 10px;"> {% csrf_token %}<img src="{{request.user.image.url}}" style="height:35px;width: 35px; border-radius: 15px;"><input
+                        style="width: 500px;display:inline-block;border-radius:15px " type="text" class="form-control" name="comentario"
+                        placeholder="Escribe un comentario público...">
                     </form>
-
+                <div class="comentarios" id="comentarios_{{publicacion.id}}" style="display:none;">
+                    </div>
+                    {% comment %}
                     {%for comentario in comentarios%}
                     
                     {% if comentario.post == publicacion %}
@@ -131,9 +134,7 @@
                     </div><br>
                     
                     <form action="{%url 'posts:contestar' comentario.id%}" method="post" style="display: none;" id="comentario_{{comentario.id}}">{% csrf_token %}<img src="{{request.user.image.url}}" style="height:25px;width: 25px; border-radius: 15px;"><input type="text" name="comentario" placeholder="responder a {{comentario.usuario}}..." class="form-control" style="width: 200px;height: 30px;display:inline-block;border-radius:15px"></form><br>
-
-                        
-                        {% if comentario.comentario_self.post ==  comentario%}
+                        {% if comentario.post ==  comentario%}
                         <div class="comentario" style="white-space: nowrap; display: inline-block; ">
                             <img src="{{comentario.usuario.image.url}}" style="height:35px;width: 35px; border-radius: 15px;float: left;">
                             <div style="border: 1px solid #000;border-radius:10px; width: auto; height: auto; max-width: 540px; margin-left: 37px;">
@@ -149,8 +150,8 @@
                         {% endif %}
                     <!-- contestado -->
                         
-                    {%endfor%}
-                </div>
+                    {%endfor%} {% endcomment %}
+                {% comment %} </div> {% endcomment %}
             </div>
         </div>
         <br>
@@ -162,72 +163,5 @@
 
 
 {%block extrajs%}
-<script>
-    function mostrarComentarios(id) {
-        comentario = document.getElementById(`comentarios_${id}`)
-        comentario.style.visibility = "visible"
-        comentario.style.display = "block"
-    }
-
-    function responder(id) {
-        responder = document.getElementById(`comentario_${id}`)
-        responder.style.display = "block"
-    }
-
-
-    function AddLike(likesCount) {
-        countLikes = document.getElementById(`likes_${likesCount}`)
-        count = Number(countLikes.textContent)
-        like = document.getElementById(`like_${likesCount}`)
-
-        dislike = document.getElementById(`dislike_${likesCount}`)
-        countDislikes = document.getElementById(`dislikes_${likesCount}`)
-        counts = Number(countDislikes.textContent)
-        if (like.style.background == 'blue') {
-            like.style.background = ""
-            like.style.color = ""
-            countLikes.innerHTML = + count - 1
-        } else {
-            like.style.background = "blue"
-            like.style.color = "white"
-            dislike.style.background = ""
-            dislike.style.color = ""
-            countLikes.innerHTML = count + 1
-            if (countDislikes.textContent == 0) {
-                countDislikes.innerHTML = counts
-            } else {
-                countDislikes.innerHTML = + counts - 1
-            }
-        }
-    }
-
-    function AddDislike(dislikeCount) {
-        countDislikes = document.getElementById(`dislikes_${dislikeCount}`)
-        count = Number(countDislikes.textContent)
-        dislike = document.getElementById(`dislike_${dislikeCount}`)
-
-        like = document.getElementById(`like_${dislikeCount}`)
-
-        countLikes = document.getElementById(`likes_${dislikeCount}`)
-        counts = Number(countLikes.textContent)
-        if (dislike.style.background == 'red') {
-            dislike.style.background = ""
-            dislike.style.color = ""
-            countDislikes.innerHTML = + count - 1
-        } else {
-            dislike.style.background = "red"
-            dislike.style.color = "white"
-            like.style.background = ""
-            like.style.color = ""
-            countDislikes.innerHTML = + 1
-            if (countLikes.textContent == 0) {
-                countLikes.innerHTML = counts
-            } else {
-                countLikes.innerHTML = counts - 1
-            }
-        }
-    }
-
-</script>
-
+<script src="{%static 'js/index.js'%}"></script>
 {%endblock extrajs%}

@@ -126,7 +126,6 @@ class SeguirUsuario(View):
 
     def post(self,request,**kwargs):
         user = request.user
-        print(user)
         # usuario = self.models.objects.get(usuario = user)
         # usuario.objects.add(amigo = seguir)
         # usuario.save()
@@ -135,4 +134,15 @@ class SeguirUsuario(View):
         pass
         #seguir = kwargs['seguir']
         #print(seguir)
-    
+
+
+class BuscarUsuario(View):
+    template_name = 'usuarios/busqueda.html'
+
+    def get(self,request):
+        query = request.GET.get('usuario') 
+        usuarios = models.Usuario.objects.filter(Q(first_name__icontains = query) | Q(last_name__icontains = query))
+        context = {
+            'usuarios':usuarios
+        }
+        return render(request,self.template_name,context)

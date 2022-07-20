@@ -4,7 +4,9 @@ from django.shortcuts import render,redirect
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView,CreateView,FormView,ListView,UpdateView,DeleteView,View
 from itertools import chain
+from django.core.serializers import serialize
 from django.db.models import Q
+
 
 from . import models
 from . import forms
@@ -30,7 +32,6 @@ class Inicio(LoginYSuperStaffMixins,ValidarPermisosMixins,ListView):
         result_list = list(chain(publicaciones, self_posts))
         comentarios = models.PostComentarios.objects.filter(post__in = result_list)
         ##no se agrega por que no tiene relacion con el post el cual es con el que se filtra
-        print(comentarios)
         return render(request,self.template_name,{'object_list':result_list,
         'comentarios':comentarios}) 
 
@@ -91,7 +92,6 @@ class GuardarPost(View):
     def post(self,request,pk):
         usuario = request.user
         post_id = models.Post.objects.get(id = pk)
-        print('pk:',pk,'post:',post_id)
         #compartido = models.PostGuardados.objects.filter(id = pk)
         guardado,created = models.PostGuardados.objects.get_or_create(
             usuario = usuario,
@@ -148,10 +148,8 @@ class PostCompartido(CreateView):
     def post(self,request,pk):
         post = models.Post.objects.get(id = pk)
         form = self.form_class(request.POST)
-        print(post.disponible)
         if form.is_valid():
             models.Post.objects.create(
-                shared_user = request.user,
                 contenido = form.cleaned_data.get('contenido'),
                 shared_post = post,
                 disponible = post.disponible,
@@ -248,6 +246,7 @@ class ContestarComentario(View):
     model = models.PostComentarios
 
     def post(self,request,pk):
+        print(pk)
         comentario = models.PostComentarios.objects.get(id = pk)
         models.PostComentarios.objects.create(
             usuario = request.user,
@@ -255,3 +254,19 @@ class ContestarComentario(View):
             comentario = request.POST.get('comentario')
             )
         return HttpResponse(status = 204)
+
+class ListarComentarios(ListView):
+    model = models.Post
+
+    def get(self,request):
+        user = request.user
+        amigos = user.amigos.all()
+        self_posts = user.post_set.all()
+        publicaciones = self.model.objects.filter(usuario__in = amigos)
+        result_list = list(chain(publicaciones, self_posts))
+        comentarios = models.PostComentarios.objects.filter(post__in = result_list)
+        return HttpResponse(serialize('json', comentarios,use_natural_foreign_keys = True), 'application/json')        
+        ##no se agrega por que no tiene relacion con el post el cual es con el que se filtra
+        print(comentarios)
+        return render(request,self.template_name,{'object_list':result_list,
+        'comentarios':comentarios}) 

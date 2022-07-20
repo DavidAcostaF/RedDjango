@@ -176,13 +176,13 @@
                     </button>
 
                     <!-- Topbar Search -->
-                    <form
+                    <form method="get" action="{%url 'usuarios:busqueda'%}"
                         class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
                         <div class="input-group">
-                            <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
+                            <input type="text" name="usuario" class="form-control bg-light border-0 small" placeholder="Search for..."
                                 aria-label="Search" aria-describedby="basic-addon2">
                             <div class="input-group-append">
-                                <button class="btn btn-primary" type="button">
+                                <button class="btn btn-primary" type="submit">
                                     <i class="fas fa-search fa-sm"></i>
                                 </button>
                             </div>
@@ -430,7 +430,7 @@
     <!-- <script src="j{%static 'js/demo/chart-area-demo.js'%}"></script> -->
     <!-- <script src="{%static 'js/demo/chart-pie-demo.js'%}"></script> -->
     <script src="{%static 'js/posts.js'%}"></script>
-    <script src="https://unpkg.com/htmx.org@1.7.0"></script>
+    <script src="https://unpkg.com/htmx.org@1.8.0" integrity="sha384-cZuAZ+ZbwkNRnrKi05G/fjBX+azI9DNOkNYysZ0I/X5ZFgsmMiBXgDZof30F5ofc" crossorigin="anonymous"></script>
     <script src="{%static 'js/dialog.js'%}"></script>
     {%block extrajs%}
     

@@ -22,7 +22,6 @@ urlpatterns = [
 
     path('comentar/<int:pk>',views.Comentarios.as_view(),name='comentar'),
     path('like_comentario/<int:pk>',views.LikeComentario.as_view(),name='like_comentario'),
+    path('comentarios',views.ListarComentarios.as_view(),name='comentarios'),
     path('contestar/<int:pk>',views.ContestarComentario.as_view(),name='contestar'),
-
-    
 ]

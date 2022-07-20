@@ -95,8 +95,7 @@
                             style="font-size: 25px; border: none; background: transparent;">...</button>
                         <div class="dropdown-menu">
                             {% if publicacion.usuario == request.user%}
-                            
-                            {% if publicacion.shared_body%}
+                            {% if publicacion.shared_post%}
                             <button class="dropdown-item" hx-get="{% url 'posts:editar_compartido' publicacion.id%}"
                             hx-target="#dialog">Editar</button>
                             {%else%}
@@ -115,55 +114,56 @@
             </h5>
             <br>
             <p class=>
-                {% if publicacion.shared_post%}
-                {{publicacion.shared_body}}
-                {% else %}
-                {{publicacion.contenido}}
-                {% endif %}</p>
-            {%if publicacion.shared_post.imagen%}<img src="{{publicacion.shared_post.imagen.url}}"
-                style="height:500px ; width: 500px;">{%else %}
-                
-                {% if publicacion.imagen %}
-                <img src="{{publicacion.imagen.url}}"
-                style="height:500px ; width: 500px;">
-                {% endif %}
+                    {{publicacion.contenido}}
+                </p>
+                {%if publicacion.imagen%}<img src="{{publicacion.imagen.url}}"
+                    style="height:500px ; width: 500px;">
+                {%endif%}
+                {% if publicacion.shared_post.imagen %}
+                <img src="{{publicacion.shared_post.imagen.url}}" style="height:500px ; width: 500px;">{%endif%}
+                {%if publicacion.shared_post%}
+                <!-- {%if publicacion.imagen%}
+                <img src="{{publicacion.imagen.url}}" style="height:500px ; width: 500px;">
+                {%endif%} -->
+                <label>Publicacion compartida de </label>
+                {{publicacion.shared_post.usuario}} </a><label> el {{publicacion.shared_post.fecha_creacion|date:"d F Y"}}
+                </label>
+                <br>
+                {{publicacion.shared_post.contenido}}
+                {%endif%}
                     
-        {%endif%}
-            {%if publicacion.shared_user%}
-            <!-- {%if publicacion.imagen%}
-            <img src="{{publicacion.imagen.url}}" style="height:500px ; width: 500px;">
-            {%endif%} -->
-            <label>Publicacion compartida de </label>
-            {{publicacion.shared_post.usuario}}</a> <label> el {{publicacion.shared_post.fecha_creacion|date:"d F Y"}}
-            </label>
-            <br>
-            {{publicacion.shared_post.contenido}}
-            {%endif%}
             <!-- <p class="card-text">With supporting text below as a natural lead-in to additional content.</p> -->
         </div>
         <div class="debajo">
-            <div class="seccion1">
-                <div class=""><label id="likes_{{publicacion.id}}">{{publicacion.like.count}}</label> Likes</div>
-                <div class=""><label id="dislikes_{{publicacion.id}}">{{publicacion.dislike.count}}</label> Dislikes
+                <div class="seccion1">
+                    <div class=""><label id="likes_{{publicacion.id}}">{{publicacion.like.count}}</label> Likes</div>
+                    <div class=""><label id="dislikes_{{publicacion.id}}">{{publicacion.dislike.count}}</label> Dislikes
+                    </div>
+                    <div class="">Comentarios</div>
+                    <div class="">{{publicacion.veces_compartidos}} Veces Compartido</div>
                 </div>
-                <div class="">Comentarios</div>
-                <div class="">{{publicacion.veces_compartidos}} Veces Compartido</div>
-            </div>
-            <div class="seccion2">
-                <form action="{%url 'posts:like' publicacion.id%}" method="post"> {% csrf_token %}<i
-                        class="fa-solid fa-thumbs-up"></i><button type="submit" class="si"
-                        id="like_{{publicacion.id}}"
-                        style="{%for like in publicacion.like.all%}{%if like == request.user %}background:blue; color:white;{%endif%}{%endfor%}"
-                        onclick="AddLike({{publicacion.id}})">Like</button></form>
-                <form action="{%url 'posts:dislike' publicacion.id%}" method="post"> {% csrf_token %}<i
-                        class="fa-solid fa-thumbs-down"></i><button type="submit" class="si"
-                        id="dislike_{{publicacion.id}}"
-                        style="{%for dislike in publicacion.dislike.all%}{%if dislike == request.user %}background:red; color:white;{%endif%}{%endfor%}"
-                        onclick="AddDislike({{publicacion.id}})">Dislike</button></form>
-                <button class="si">Comentar</button>
-                <button class="si" hx-get="{% url 'posts:compartir_post' publicacion.id%}"
-                hx-target="#dialog">Compartir</button>
-            </div>
+                <div class="seccion2">
+
+                    <form action="{%url 'posts:like' publicacion.id%}" method="post"> {% csrf_token %}<i
+                            class="fa-solid fa-thumbs-up"></i><button type="submit" class="si"
+                            id="like_{{publicacion.id}}"
+                            style="{% if request.user in publicacion.like.all %}background:blue; color:white;{%endif%}"
+                            onclick="AddLike({{publicacion.id}})">Like</button></form>
+                    <form action="{%url 'posts:dislike' publicacion.id%}" method="post"> {% csrf_token %}<i
+                            class="fa-solid fa-thumbs-down"></i><button type="submit" class="si"
+                            id="dislike_{{publicacion.id}}"
+                            style="{% if request.user in publicacion.dislike.all %}background:red; color:white;{%endif%}"
+                            onclick="AddDislike({{publicacion.id}})">Dislike</button></form>
+                    <button class="si" {% comment %} onclick="mostrarComentarios({{publicacion.id}})"{% endcomment %} onclick="comentarios({{publicacion.id}})">Comentar</button> 
+                    <button class="si" hx-get="{% url 'posts:compartir_post' publicacion.id%}"
+                        hx-target="#dialog">Compartir</button>
+                </div>
+                    <form action="{%url 'posts:comentar' publicacion.id%}" method="post" id="comentar_{{publicacion.id}}" style="display:none;margin-bottom: 10px;"> {% csrf_token %}<img src="{{request.user.image.url}}" style="height:35px;width: 35px; border-radius: 15px;"><input
+                        style="width: 500px;display:inline-block;border-radius:15px " type="text" class="form-control" name="comentario"
+                        placeholder="Escribe un comentario público...">
+                    </form>
+                <div class="comentarios" id="comentarios_{{publicacion.id}}" style="display:none;">
+                    </div>
         </div>
             <!-- <p class="card-text">With supporting text below as a natural lead-in to additional content.</p> -->
         </div>
@@ -176,58 +176,5 @@
 {%endblock body%}
 
 {%block extrajs%}
-<script>
-    function AddLike(likesCount) {
-        countLikes = document.getElementById(`likes_${likesCount}`)
-        count = Number(countLikes.textContent)
-        like = document.getElementById(`like_${likesCount}`)
-
-        dislike = document.getElementById(`dislike_${likesCount}`)
-        countDislikes = document.getElementById(`dislikes_${likesCount}`)
-        counts = Number(countDislikes.textContent)
-        if (like.style.background == 'blue') {
-            like.style.background = ""
-            like.style.color = ""
-            countLikes.innerHTML = + count - 1
-        } else {
-            like.style.background = "blue"
-            like.style.color = "white"
-            dislike.style.background = ""
-            dislike.style.color = ""
-            countLikes.innerHTML = count + 1
-            if (countDislikes.textContent == 0) {
-                countDislikes.innerHTML = counts
-            } else {
-                countDislikes.innerHTML = + counts - 1
-            }
-        }
-    }
-
-    function AddDislike(dislikeCount) {
-        countDislikes = document.getElementById(`dislikes_${dislikeCount}`)
-        count = Number(countDislikes.textContent)
-        dislike = document.getElementById(`dislike_${dislikeCount}`)
-
-        like = document.getElementById(`like_${dislikeCount}`)
-
-        countLikes = document.getElementById(`likes_${dislikeCount}`)
-        counts = Number(countLikes.textContent)
-        if (dislike.style.background == 'red') {
-            dislike.style.background = ""
-            dislike.style.color = ""
-            countDislikes.innerHTML = + count - 1
-        } else {
-            dislike.style.background = "red"
-            dislike.style.color = "white"
-            like.style.background = ""
-            like.style.color = ""
-            countDislikes.innerHTML = + 1
-            if (countLikes.textContent == 0) {
-                countLikes.innerHTML = counts
-            } else {
-                countLikes.innerHTML = counts - 1
-            }
-        }
-    }
-</script>
+<script src="{%static 'js/index.js'%}"></script>
 {%endblock extrajs%}

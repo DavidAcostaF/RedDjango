@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 {%load static%}
 {%block title%}
-Usuarios disponibles
+Busqueda Usuarios
 {%endblock title%}
-{%block info%}Usuarios disponibles{%endblock info%}
+{%block info%}Busqueda Usuarios{%endblock info%}
 {%block body%}
 
 {%for usuario in usuarios%}
@@ -17,7 +17,5 @@ Usuarios disponibles
         <a href="{%url 'usuarios:muro' usuario.first_name usuario.last_name %}" class="btn btn-primary">Ver usuario</a>
     </div>
 </div>
-    
-
 {%endfor %}
 {%endblock body%}
