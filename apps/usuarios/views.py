@@ -17,16 +17,17 @@ from . import models
 from . import forms
 from apps.red.models import Post
 
-class Accounts(TemplateView):
-    template_name = 'login.html'
+# class Accounts(TemplateView):
+#     template_name = 'login.html'
 
-    def get(self,request):
-        return render(request,self.template_name,{
-            'form2':forms.FormularioUsuario,
-            'form1':forms.FormularioLogin
-        })
+#     def get(self,request):
+#         return render(request,self.template_name,{
+#             'form2':forms.FormularioUsuario,
+#             'form1':forms.FormularioLogin
+#         })
 
 class Login(FormView):
+    template_name = 'login.html'
     form_class = forms.FormularioLogin  
     success_url = reverse_lazy('index')  
     @method_decorator(csrf_protect)
@@ -41,9 +42,6 @@ class Login(FormView):
         login(self.request,form.get_user())
         return super(Login,self).form_valid(form)
 
-    def get(self,request):
-        return redirect('index')
-
 
 def logoutUsuario(request):
     logout(request)
@@ -51,24 +49,26 @@ def logoutUsuario(request):
 
 
 class CrearUsuario(CreateView):
-    #model = models.Usuario
+    model = models.Usuario
     form_class = forms.FormularioUsuario
-    template_name = 'login.html'
-    # success_url = reverse_lazy('login')
+    template_name = 'register.html'
+    #success_url = reverse_lazy('login')
 
     def post(self,request,*args,**kwargs):
-            form = self.form_class(request.POST)
-            if form.is_valid():
-                nuevo_usuario = models.Usuario(
-                    email = form.cleaned_data.get('email'),
-                    username = form.cleaned_data.get('username'),
-                    first_name = form.cleaned_data.get('first_name'),
-                    last_name = form.cleaned_data.get('last_name')
-                )
-                nuevo_usuario.set_password(form.cleaned_data.get('password1'))
-                nuevo_usuario.save()
-                return redirect('accounts')
-            return HttpResponse(status = 200)
+        form = self.form_class(request.POST)
+        print(form)
+        if form.is_valid():
+            nuevo_usuario = models.Usuario(
+                email = form.cleaned_data.get('email'),
+                username = form.cleaned_data.get('username'),
+                first_name = form.cleaned_data.get('first_name'),
+                last_name = form.cleaned_data.get('last_name')
+            )
+            nuevo_usuario.set_password(form.cleaned_data.get('password1'))
+            nuevo_usuario.save()
+            return redirect('login')
+        else:
+            return redirect('register')
 
 class ListarUsuarios(ListView):
     model = models.Usuario
@@ -152,3 +152,14 @@ class BuscarUsuario(View):
             'hashtag':publicaciones,
         }
         return render(request,self.template_name,context)
+
+class ConfiguracionPerfil(View):
+    model = models.Usuario
+    template_name = "configuracion_perfil"
+    form_class = forms.FormularioUsuario
+    
+    def get(self,request):
+        user = request.user
+        usuario = models.Usuario.objects.get(usuario = user)
+        return render(request,self.template_name)
+

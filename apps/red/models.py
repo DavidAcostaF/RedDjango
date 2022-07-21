@@ -13,7 +13,7 @@ class Post(models.Model):
     id = models.AutoField(primary_key=True)
     shared_post = models.ForeignKey(to='self',blank = True,on_delete=models.CASCADE,null=True)
     usuario = models.ForeignKey(Usuario,on_delete=models.CASCADE)
-    contenido = models.TextField('Descripcion',max_length=150,blank=True,null=True)
+    contenido = models.TextField('Descripcion',max_length=150,blank=False,null=False)
     imagen = models.ImageField('Imagen post', upload_to='post/',blank = True,null=True)
     disponible = models.IntegerField(null=False,blank=False,choices=privacidad_publicacion,default=privacidad_publicacion[0])
     veces_compartidos = models.IntegerField('Veces compartido',null=True,blank=True,default=0)

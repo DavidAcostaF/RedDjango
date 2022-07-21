@@ -15,7 +15,7 @@ class FormularioLogin(AuthenticationForm):
 class FormularioUsuario(forms.ModelForm):
     password1 = forms.CharField(label = 'Contraseña',widget = forms.PasswordInput(
         attrs = {
-            'class': 'form-control',
+            'class': 'form-control inputs',
             'placeholder': 'Ingrese su contraseña...',
             'id': 'password1',
             'required':'required',
@@ -24,7 +24,7 @@ class FormularioUsuario(forms.ModelForm):
 
     password2 = forms.CharField(label = 'Contraseña de Confirmación', widget = forms.PasswordInput(
         attrs={
-            'class': 'form-control',
+            'class': 'form-control inputs',
             'placeholder': 'Ingrese nuevamente su contraseña...',
             'id': 'password2',
             'required': 'required',
@@ -37,25 +37,25 @@ class FormularioUsuario(forms.ModelForm):
         widgets = {
             'email': forms.EmailInput(
                 attrs = {
-                    'class': 'form-control',
+                    'class': 'form-control inputs',
                     'placeholder': 'Correo Electrónico',
                 }
             ),
             'first_name': forms.TextInput(
                 attrs={
-                    'class': 'form-control',
+                    'class': 'form-control inputs',
                     'placeholder': 'Ingrese su nombre',
                 }
             ),
             'last_name': forms.TextInput(
                 attrs = {
-                    'class': 'form-control',
+                    'class': 'form-control inputs',
                     'placeholder': 'Ingrese sus apellidos',
                 }                
             ),
             'username': forms.TextInput(
                 attrs = {
-                    'class': 'form-control',
+                    'class': 'form-control inputs',
                     'placeholder': 'Ingrese su nombre de usuario',
                 }
             ),

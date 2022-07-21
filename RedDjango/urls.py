@@ -19,7 +19,7 @@ from django.conf import settings
 from django.contrib.staticfiles.urls import static
 
 from apps.red import views
-from apps.usuarios.views import CrearUsuario,Login,Accounts,logoutUsuario
+from apps.usuarios.views import CrearUsuario,Login,logoutUsuario
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,7 +27,6 @@ urlpatterns = [
     path('',views.Inicio.as_view(),name = 'index'),
     path('posts/',include(('apps.red.urls', 'posts'))),
     path('usuarios/',include(('apps.usuarios.urls', 'usuarios'))),
-    path('accounts/',Accounts.as_view(),name = 'accounts'),
     path('accounts/register',CrearUsuario.as_view(),name = 'register'),
     path('accounts/login',Login.as_view(),name = 'login'),
     path('logout/',logoutUsuario,name = 'logout'),
