@@ -11,6 +11,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.generic.edit import FormView
 from django.contrib.auth import login, logout
 from django.db.models import Q
+from django.core.paginator import Paginator
 
 from . import models
 from . import forms
@@ -93,6 +94,9 @@ class Muro(DetailView):
         post_usuario = self.model.objects.filter(usuario = usuario, estado = True)
         amigo = models.Usuario.objects.filter(usuario__amigos = usuario)
         #result_list = list(chain(post_compartidos,post_usuario))
+        paginator = Paginator(post_usuario,10)
+        page = request.GET.get('page')
+        post_usuario = paginator.get_page(page)
         return render(request,self.template_name,{
         'object_list':post_usuario,
         'usuario':usuario,
@@ -105,7 +109,6 @@ class Muro(DetailView):
     def post(self,request,**kwargs):
         user = request.user
         agregar = self.get_object()
-        
         eliminar = models.Usuario.objects.filter(usuario__amigos = agregar)
         if eliminar:
             user.amigos.remove(agregar)
@@ -140,9 +143,12 @@ class BuscarUsuario(View):
     template_name = 'usuarios/busqueda.html'
 
     def get(self,request):
-        query = request.GET.get('usuario') 
+        query = request.GET.get('usuario')
+
         usuarios = models.Usuario.objects.filter(Q(first_name__icontains = query) | Q(last_name__icontains = query))
+        publicaciones = Post.objects.filter(Q(contenido__icontains = query))
         context = {
-            'usuarios':usuarios
+            'usuarios':usuarios,
+            'hashtag':publicaciones,
         }
         return render(request,self.template_name,context)

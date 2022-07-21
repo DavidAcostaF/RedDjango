@@ -1,9 +1,12 @@
 {% extends 'base.html' %}
 {%load static%}
+{%block extra_css%}
+<link rel="stylesheet" href="{%static 'css/style.css'%}">
+{%endblock extra_css%}
 {%block title%}
 Busqueda Usuarios
 {%endblock title%}
-{%block info%}Busqueda Usuarios{%endblock info%}
+{%block info%}Contenido Relacionado{%endblock info%}
 {%block value%}
 {{request.GET.usuario}} 
 {%endblock value%}
@@ -22,4 +25,105 @@ Busqueda Usuarios
     </div>
 </div>
 {%endfor %}
+
+
+{%for publicacion in hashtag%}
+<div class="d-flex justify-content-center">
+    <div style="align-items: center; justify-content: center">
+        <div class="card" style="width: 34rem; border-radius: 10px;">
+            <div class="card-body">
+                <h5 class="card-title"><a
+                        href="{%if publicacion.shared_user %}{%url 'usuarios:muro' publicacion.shared_user.first_name publicacion.shared_user.last_name%}{%else%} {%url 'usuarios:muro' publicacion.usuario.first_name publicacion.usuario.last_name %}{%endif%}">
+                        <img src="{{publicacion.usuario.image.url}}"
+                            style="height:35px;width: 35px; border-radius: 15px;"></a><a
+                        href="{%if publicacion.shared_post %}{%url 'usuarios:muro' publicacion.usuario.first_name publicacion.usuario.last_name%}{%else%} {%url 'usuarios:muro' publicacion.usuario.first_name publicacion.usuario.last_name %}{%endif%}">
+                        {% if publicacion.shared_post%}
+                        {{publicacion.usuario}}
+                        {% else %}
+                        {{publicacion.usuario.first_name}}
+                        {{publicacion.usuario.last_name}}
+                        {% endif %}
+                    </a> <label>{{publicacion.fecha_creacion|date:"d F Y"}}
+                    </label><label style="float:right;">
+                        <div class="dropdown">
+                            <button class="" type="button" id="dropdown1" data-toggle="dropdown" aria-label="Close"
+                                style="font-size: 25px; border: none; background: transparent;">...</button>
+                            <div class="dropdown-menu">
+                                {% if publicacion.usuario == request.user%}
+                                {% if publicacion.shared_post%}
+                                <button class="dropdown-item" hx-get="{% url 'posts:editar_compartido' publicacion.id%}"
+                                hx-target="#dialog">Editar</button>
+                                {%else%}
+                                    <button class="dropdown-item" hx-get="{% url 'posts:editar_post' publicacion.id%}"
+                                    hx-target="#dialog">Editar</button>
+                                {% endif %}
+                                <button class=" dropdown-item" hx-post="{% url 'posts:eliminar_post' publicacion.id%}"
+                                    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>Eliminar</button>
+                                {% endif %}
+                                <a class="dropdown-item" hx-post="{% url 'posts:guardar_post' publicacion.id%}"
+                                    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>Guardar Post</a>
+                                <a class="dropdown-item" hx-get="{% url 'posts:compartir_post' publicacion.id%}"
+                                    hx-target="#dialog">Compartir Post</a>
+                            </div>
+                        </div>
+                </h5>
+                <br>
+                <p class=>
+                    {{publicacion.contenido}}
+                </p>
+                {%if publicacion.imagen%}<img src="{{publicacion.imagen.url}}"
+                    style="height:500px ; width: 500px;">
+                {%endif%}
+                {% if publicacion.shared_post.imagen %}
+                <img src="{{publicacion.shared_post.imagen.url}}" style="height:500px ; width: 500px;">{%endif%}
+                {%if publicacion.shared_post%}
+
+                <label>Publicacion compartida de </label>
+                {{publicacion.shared_post.usuario}} </a><label> el {{publicacion.shared_post.fecha_creacion|date:"d F Y"}}
+                </label>
+                <br>
+                {{publicacion.shared_post.contenido}}
+                {%endif%}
+                <!-- <p class="card-text">With supporting text below as a natural lead-in to additional content.</p> -->
+            </div>
+            <div class="debajo">
+                <div class="seccion1">
+                    <div class=""><label id="likes_{{publicacion.id}}">{{publicacion.like.count}}</label> Likes</div>
+                    <div class=""><label id="dislikes_{{publicacion.id}}">{{publicacion.dislike.count}}</label> Dislikes
+                    </div>
+                    <div class="">Comentarios</div>
+                    <div class="">{{publicacion.veces_compartidos}} Veces Compartido</div>
+                </div>
+                <div class="seccion2">
+
+                    <form action="{%url 'posts:like' publicacion.id%}" method="post"> {% csrf_token %}<i
+                            class="fa-solid fa-thumbs-up"></i><button type="submit" class="si"
+                            id="like_{{publicacion.id}}"
+                            style="{% if request.user in publicacion.like.all %}background:blue; color:white;{%endif%}"
+                            onclick="AddLike({{publicacion.id}})">Like</button></form>
+                    <form action="{%url 'posts:dislike' publicacion.id%}" method="post"> {% csrf_token %}<i
+                            class="fa-solid fa-thumbs-down"></i><button type="submit" class="si"
+                            id="dislike_{{publicacion.id}}"
+                            style="{% if request.user in publicacion.dislike.all %}background:red; color:white;{%endif%}"
+                            onclick="AddDislike({{publicacion.id}})">Dislike</button></form>
+                    <button class="si" {% comment %} onclick="mostrarComentarios({{publicacion.id}})"{% endcomment %} onclick="comentarios({{publicacion.id}})">Comentar</button> 
+                    <button class="si" hx-get="{% url 'posts:compartir_post' publicacion.id%}"
+                        hx-target="#dialog">Compartir</button>
+                </div>
+                    <form action="{%url 'posts:comentar' publicacion.id%}" method="post" id="comentar_{{publicacion.id}}" style="display:none;margin-bottom: 10px;"> {% csrf_token %}<img src="{{request.user.image.url}}" style="height:35px;width: 35px; border-radius: 15px;"><input
+                        style="width: 500px;display:inline-block;border-radius:15px " type="text" class="form-control" name="comentario"
+                        placeholder="Escribe un comentario público...">
+                    </form>
+                <div class="comentarios" id="comentarios_{{publicacion.id}}" style="display:none;">
+                    </div>
+            </div>
+        </div>
+        <br>
+    </div>
+</div>
+{%endfor%}
 {%endblock body%}
+
+{%block extrajs%}
+<script src="{%static 'js/index.js'%}"></script>
+{%endblock extrajs%}
