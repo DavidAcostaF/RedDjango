@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{%block body%}
+<style>
+    .inputs{
+        border-radius: 40px;
+        padding: 1.5rem 1rem;
+    }
+</style>
+<div class="container">
+        <div class="card-body p-0">
+            <!-- Nested Row within Card Body -->
+            <div class="row">
+                <div class="d-flex justify-content-center">
+                <div class="col-lg-7">
+                    <div class="p-5">
+                        <div id="forms-errors">{{form_errors}}</div>
+                        <form class="user" method="post" action="{%url 'usuarios:configuracion_perfil'%}" enctype="multipart/form-data">{% csrf_token %} 
+                            <div class="form-group row">
+                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                    <label for="">Nombres</label>
+                                    {{form.first_name}}
+                                </div>
+                                <div class="col-sm-6">
+                                    <label for="">Apellidos</label>
+                                    {{form.last_name}}
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="">Correo</label>
+                                {{form.email}}
+                            </div>
+                            <div class="form-group">
+                                <label for="">Nombre de usuario</label>
+                                {{form.username}}
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                    <label for="">Imagen de perfil</label>
+                                    {{form.image}}
+                                </div>
+                                <div class="col-sm-6">
+                                    <label for="">Imagen actual de perfil</label><br>
+                                    {%if form.instance.image%}
+                                    <img src="{{form.instance.image.url}}" style="height: 70px;width:70px; border-radius:30px" alt="">
+                                    {%endif%}
+                                </div>
+                            </div>
+                            <button type="submit"class="btn btn-primary btn-user btn-block">Crear Cuenta</button>
+                        </form>
+                    </div>
+                </div>
+    </div>
+</div>
+
+</div>
+{%endblock body%}

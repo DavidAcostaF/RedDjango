@@ -153,13 +153,28 @@ class BuscarUsuario(View):
         }
         return render(request,self.template_name,context)
 
-class ConfiguracionPerfil(View):
+class ConfiguracionPerfil(CreateView):
     model = models.Usuario
-    template_name = "configuracion_perfil"
-    form_class = forms.FormularioUsuario
-    
+    template_name = "configuracion_perfil.html"
+    form_class = forms.EditarUsuario
+
     def get(self,request):
         user = request.user
-        usuario = models.Usuario.objects.get(usuario = user)
-        return render(request,self.template_name)
+        datos_usuario = self.form_class(instance= user)
+        context = {}
+        context['form'] = datos_usuario
+        return render(request,self.template_name,context)
 
+    def post(self,request):
+        user = request.user
+        form = self.form_class(request.POST,request.FILES,instance = user )
+        
+        context = {}
+        context['form'] = form
+        context['form_errors'] = form.errors
+        if form.is_valid():
+            form.save()
+            #return redirect('usuarios:configuracion_perfil')
+        else:
+            print(form.errors)
+        return render(request,self.template_name,context)

@@ -33,7 +33,15 @@ class FormularioUsuario(forms.ModelForm):
 
     class Meta:
         model = models.Usuario
-        fields = ['username','first_name','last_name','email']
+        fields = ['username','first_name','last_name','email','image']
+        labels = {
+            "email": "Email",
+            "first_name":"Nombres",
+            "imagen": "Imagen de perfil",
+            "disponible": "Privacidad de la publicacion",
+            "imagen": "Imagen de perfil",
+            "disponible": "Privacidad de la publicacion",
+        }
         widgets = {
             'email': forms.EmailInput(
                 attrs = {
@@ -59,6 +67,12 @@ class FormularioUsuario(forms.ModelForm):
                     'placeholder': 'Ingrese su nombre de usuario',
                 }
             ),
+            'image': forms.FileInput(
+                attrs = {
+                    'class': 'form-control inputs',
+                    #'placeholder': 'Ingrese su nombre de usuario',
+                }
+            ),
         }
 
     def clean_password2(self):
@@ -80,3 +94,46 @@ class FormularioUsuario(forms.ModelForm):
         if commit:
             user.save()
         return user
+
+
+class EditarUsuario(forms.ModelForm):
+    class Meta:
+        model = models.Usuario
+        fields = ['username','first_name','last_name','email','image']
+        labels = {
+            'username':'Usuario',
+            'first_name':'Nombres'
+        }
+        widgets = {
+            'username':forms.TextInput(
+                attrs = {
+                    'class':'form-control inputs',
+                    'placeholder':'Username'
+                }
+            ),
+            'first_name':forms.TextInput(
+                attrs = {
+                    'class':'form-control inputs',
+                    'placeholder':'Nombre'
+                }
+            ),
+            'last_name':forms.TextInput(
+                attrs = {
+                    'class':'form-control inputs',
+                    'placeholder':'Apellidos'
+                }
+            ),
+            'email':forms.EmailInput(
+                attrs = {
+                    'class':'form-control inputs',
+                    'placeholder':'Email',
+                    
+                }
+            ),
+            'image':forms.FileInput(
+                attrs = {
+                    'class':'form-control inputs',
+                    'placeholder':'Imagen de perfil'
+                }
+            ),
+        }

@@ -68,7 +68,9 @@ class EditarPost(UpdateView):
     success_url = reverse_lazy('index')
 
     def get_context_data(self,**kwargs):
+        user = self.request.user
         context = super().get_context_data(**kwargs)
+        context['username'] = user
         return context
 
 

@@ -6,7 +6,7 @@ from django.contrib.auth.models import AbstractBaseUser,AbstractUser, BaseUserMa
 
 
 class Usuario(AbstractUser):
-    image = models.ImageField('Imagen de Perfil',upload_to='perfil/',default='default.png',blank = True,null = True)
+    image = models.ImageField('Imagen de Perfil',upload_to='perfil/',default='default.png',blank = False,null = False)
     amigos = models.ManyToManyField(to='self',symmetrical=False,blank = True)#,related_name='amigo'
     portada = models.ImageField('Portada Muro',upload_to='portada/',blank = True,null = True)
     estado = models.BooleanField(default=True)
