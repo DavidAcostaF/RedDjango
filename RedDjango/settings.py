@@ -40,7 +40,9 @@ INSTALLED_APPS = [
     'apps.red',
     'apps.usuarios',
     'rest_framework',
-    'crispy_forms'
+    'crispy_forms',
+    'crispy_bootstrap5',
+    'channels'
 ]
 
 MIDDLEWARE = [
@@ -71,8 +73,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'RedDjango.wsgi.application'
-
+ASGI_APPLICATION = 'RedDjango.asgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
@@ -136,3 +137,14 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CRISPY_TEMPLATE_PACK = "bootstrap5"
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+        # 'CONFIG': {
+        #     'hosts': [('127.0.0.1', 6379)],
+        # }
+    }
+}

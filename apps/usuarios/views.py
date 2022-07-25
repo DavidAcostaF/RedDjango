@@ -17,14 +17,6 @@ from . import models
 from . import forms
 from apps.red.models import Post
 
-# class Accounts(TemplateView):
-#     template_name = 'login.html'
-
-#     def get(self,request):
-#         return render(request,self.template_name,{
-#             'form2':forms.FormularioUsuario,
-#             'form1':forms.FormularioLogin
-#         })
 
 class Login(FormView):
     template_name = 'login.html'
@@ -110,12 +102,22 @@ class Muro(DetailView):
         user = request.user
         agregar = self.get_object()
         eliminar = models.Usuario.objects.filter(usuario__amigos = agregar)
+        first_person = models.Thread.objects.filter(first_person = user,second_person = agregar)
+        second_person = models.Thread.objects.filter(first_person = agregar,second_person = user)
         if eliminar:
             user.amigos.remove(agregar)
+            first_person.delete()
         else:
-            amigo = user.amigos.add(agregar)
+            if second_person:
+                print(second_person)
+            else:
+                models.Thread.objects.create(
+                first_person = user,
+                second_person = agregar
+            )
+            user.amigos.add(agregar)
+
         return redirect(request.path)
-        #'usuarios:muro',kwargs['nombre'],kwargs['apellido']
 
 class UsuariosAgregados(ListView):
     template_name = 'usuarios/usuarios_seguidos.html'
@@ -168,7 +170,7 @@ class ConfiguracionPerfil(CreateView):
     def post(self,request):
         user = request.user
         form = self.form_class(request.POST,request.FILES,instance = user )
-        
+
         context = {}
         context['form'] = form
         context['form_errors'] = form.errors
@@ -177,4 +179,14 @@ class ConfiguracionPerfil(CreateView):
             #return redirect('usuarios:configuracion_perfil')
         else:
             print(form.errors)
+        return render(request,self.template_name,context)
+
+class Chat(View):
+    template_name = 'usuarios/chat.html'
+
+    def get(self,request):
+        threads = models.Thread.objects.by_user(user = request.user).prefetch_related('chatmessage_thread')
+        context = {
+            'Threads': threads
+        }
         return render(request,self.template_name,context)

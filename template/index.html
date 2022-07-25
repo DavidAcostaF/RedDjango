@@ -132,6 +132,68 @@
     </div>
 
 {%endblock body%}
+{%block alertas_totales%}
+{{notificaciones.count}}
+{%endblock alertas_totales%}
+
+{%block alerts%}
+
+{%for notificacion in notificaciones%}
+
+{%if notificacion.accion == 0%}
+<form action="{%url 'posts:post_detalle' notificacion.id%}" method="post"> {% csrf_token %}
+<a class="dropdown-item d-flex align-items-center" href="#">
+    <div class="mr-3">
+        <div class="icon-circle bg-warning">
+            <i class="fas fa-donate text-white"></i>
+        </div>
+    </div>
+    <div>
+        <div class="small text-gray-500">{{notificacion.fecha_creacion}}</div>
+        El usuario: {{notificacion.user}} compartio tu publicacion {{notificacion.post.contenido}}
+        <button type="submit" class="btn btn-danger btn-sm"  style="float: right;" onclick="eliminarNotificacion({{notificacion.id}})">&times;</button>
+    </div>
+</a>
+</form>
+
+{%endif%}
+{%if notificacion.accion == 1%}
+<form action="{%url 'posts:post_detalle' notificacion.id%}" method="post">{% csrf_token %}
+<a class="dropdown-item d-flex align-items-center" href="" >
+    <div class="mr-3">
+        <div class="icon-circle bg-success">
+            <i class="fas fa-donate text-white"></i>
+        </div>
+    </div>
+    <!-- id="notificacion_{{notificacion.id}}" -->
+    <div>
+    <div class="small text-gray-500">{{notificacion.fecha_creacion}}</div>
+        Al usuario: {{notificacion.user}} le gusta tu publicacion {{notificacion.post.contenido}}
+        <button type="submit" class="btn btn-danger btn-sm"  style="float: right;" onclick="eliminarNotificacion({{notificacion.id}})">&times;</button>
+    </div>
+</a>
+</form>
+{%endif%}
+{%if notificacion.accion == 2%}
+<form action="{%url 'posts:post_detalle' notificacion.id%}" method="post"> {% csrf_token %}
+<a class="dropdown-item d-flex align-items-center" href="#">
+    <div class="mr-3">
+        <div class="icon-circle bg-warning">
+            <i class="fas fa-donate text-white"></i>
+        </div>
+    </div>
+    <div>
+    <div class="small text-gray-500">{{notificacion.fecha_creacion}}</div>
+        El usuario: {{notificacion.user}} comento tu publicacion {{notificacion.post.contenido}}
+        <button type="submit" class="btn btn-danger btn-sm"  style="float: right;" onclick="eliminarNotificacion({{notificacion.id}})">&times;</button>
+    </div>
+</a>
+</form>
+
+{%endif%}
+{%endfor%}
+
+{%endblock alerts%}
 
 {%block extrajs%}
 <script src="{%static 'js/index.js'%}"></script>

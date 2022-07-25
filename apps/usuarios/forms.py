@@ -102,7 +102,9 @@ class EditarUsuario(forms.ModelForm):
         fields = ['username','first_name','last_name','email','image']
         labels = {
             'username':'Usuario',
-            'first_name':'Nombres'
+            'first_name':'Nombres',
+            'email':'Correo',
+            'last_name':'Apellidos'
         }
         widgets = {
             'username':forms.TextInput(

@@ -10,5 +10,7 @@ urlpatterns = [
     path('muro/<str:nombre>.<str:apellido>/',views.Muro.as_view(),name = 'muro'),
     path('seguir/<str:nombre>/',views.SeguirUsuario.as_view(),name = 'seguir'),
     path('busqueda',views.BuscarUsuario.as_view(),name = 'busqueda'),
-    path('configuracion_perfil',views.ConfiguracionPerfil.as_view(),name="configuracion_perfil")
+    path('configuracion_perfil',views.ConfiguracionPerfil.as_view(),name="configuracion_perfil"),
+    path('chat/',views.Chat.as_view(),name='chat'),
+
 ]

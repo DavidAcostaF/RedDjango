@@ -140,3 +140,10 @@ function comentarios(id) {
         comentar.style.display = "none"
     }
 }
+
+
+
+function eliminarNotificacion (id){
+    notificacion =  document.getElementById(`notificacion_${id}`)
+    notificacion.innerHTML = ""
+}

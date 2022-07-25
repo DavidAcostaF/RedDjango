@@ -2,7 +2,7 @@ from msilib.schema import ListView
 from django.http import HttpResponse
 from django.shortcuts import render,redirect
 from django.urls import reverse_lazy
-from django.views.generic import TemplateView,CreateView,FormView,ListView,UpdateView,DeleteView,View
+from django.views.generic import TemplateView,CreateView,FormView,ListView,UpdateView,DeleteView,View,DetailView
 from itertools import chain
 from django.core.serializers import serialize
 from django.db.models import Q
@@ -31,13 +31,14 @@ class Inicio(LoginYSuperStaffMixins,ValidarPermisosMixins,ListView):
         self_posts = user.post_set.all()
         publicaciones = self.model.objects.filter(usuario__in = amigos)
         result_list = list(chain(publicaciones, self_posts))
-        
+        notificaciones = models.Notificaciones.objects.filter(post__usuario = user)
+
         paginator = Paginator(result_list,10)
         page = request.GET.get('page')
         result_list = paginator.get_page(page)
         #comentarios = models.PostComentarios.objects.filter(post__in = result_list)
         ##no se agrega por que no tiene relacion con el post el cual es con el que se filtra
-        return render(request,self.template_name,{'object_list':result_list}) 
+        return render(request,self.template_name,{'object_list':result_list,'notificaciones':notificaciones}) 
 
 
 class Posts(LoginYSuperStaffMixins,ValidarPermisosMixins,CreateView):
@@ -109,25 +110,6 @@ class GuardarPost(View):
             guardado.save()
         return HttpResponse(status = 204,headers={'HX-Redirect':''}) 
 
-        # usuario = request.user
-        # post_id = models.Post.objects.filter(id = pk)
-        # post_compartido = models.PostCompartido.objects.filter(id = pk)
-        # print(post_compartido)
-        # if post_id:
-        #     guardado,created = models.PostGuardados.objects.get_or_create(
-        #         usuario = usuario,
-        #         post = post_id
-        #     )
-            
-        # guardado,created = models.PostCompartidoGuardado.objects.get_or_create(
-        #     usuario = usuario,
-        #     post = post_compartido
-        # )
-        # if created:
-        #     pass
-        # guardado.save()
-        # return HttpResponse(status = 204,headers={'HX-Redirect':''})
-
 
 class PostGuardados(ListView):
     model = models.PostGuardados
@@ -162,6 +144,11 @@ class PostCompartido(CreateView):
                 usuario = request.user
             )
             post.veces_compartidos += 1
+            models.Notificaciones.objects.create(
+                user = request.user,
+                post = post,
+                accion = 0
+            )
             post.save()
         return HttpResponse(status = 204,headers={'HX-Redirect':''}) 
 
@@ -181,7 +168,6 @@ class LikePost(View):
     model = models.Post
 
     def post(self,request,pk):
-
         usuario = request.user
         post = models.Post.objects.get(id = pk)
         likes = post.like.all()
@@ -191,8 +177,15 @@ class LikePost(View):
         # else:
         if post.like.contains(usuario):
             post.like.remove(usuario)
+            notificacion = models.Notificaciones.objects.filter(post = post)
+            notificacion.delete()
         else:
             post.like.add(usuario)
+            models.Notificaciones.objects.create(
+                user = request.user,
+                post = post,
+                accion = 1
+            )
             post.dislike.remove(usuario)
         return HttpResponse(status = 204)
 
@@ -204,11 +197,6 @@ class Dislikes(View):
         usuario = request.user
         post = models.Post.objects.get(id = pk)
         dislikes = post.dislike.all()
-
-        # if dislikes.count() == 0:
-        #     post.dislike.add(usuario)
-        #     post.like.remove(usuario)
-        # else:
 
         if post.dislike.contains(usuario):
             post.dislike.remove(usuario)
@@ -230,6 +218,11 @@ class Comentarios(View):
             post = post,
             comentario = comentario,
         )
+        models.Notificaciones.objects.create(
+                user = usuario,
+                post = post,
+                accion = 2
+            )
         return HttpResponse(status = 204)
 
 
@@ -261,6 +254,7 @@ class ContestarComentario(View):
             )
         return HttpResponse(status = 204)
 
+## no se utiliza
 class ListarComentarios(ListView):
     model = models.Post
 
@@ -272,7 +266,17 @@ class ListarComentarios(ListView):
         result_list = list(chain(publicaciones, self_posts))
         comentarios = models.PostComentarios.objects.filter(post__in = result_list)
         return HttpResponse(serialize('json', comentarios,use_natural_foreign_keys = True), 'application/json')        
-        ##no se agrega por que no tiene relacion con el post el cual es con el que se filtra
-        print(comentarios)
-        return render(request,self.template_name,{'object_list':result_list,
-        'comentarios':comentarios}) 
+
+class EliminarNotificacion(View):
+    # model = models.Post
+    # template_name = 'posts/post_detalle.html'
+
+    # def get(self,request,*args,**kwargs):
+    #     if self.get_object():
+    #         return render(request,self.template_name,{'object':self.get_object})
+    #     return redirect('index')
+
+    def post(self,requst,pk):
+        notificacion = models.Notificaciones.objects.get(id = pk)
+        notificacion.delete()
+        return HttpResponse(status = 204)
