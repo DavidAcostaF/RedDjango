@@ -10,14 +10,12 @@
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 		<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.js"></script>
-
         <link rel="stylesheet" href="{% static 'css/messages.css' %}">
-
     </head>
 	<!--Coded With Love By Mutiullah Samim-->
 	<body>
     {% if user.is_authenticated %}
-        <h1 style="text-align: end; padding-right: 10px">Logged in as : {{ user.username }}</h1>
+        <!-- <h1 style="text-align: end; padding-right: 10px">Logged in as : {{ user.username }}</h1> -->
         <input type="hidden" id="logged-in-user" value="{{ user.id }}">
     {% endif %}
 		<div class="container-fluid h-100">
@@ -38,11 +36,8 @@
                                 <li class="{% if forloop.first %}active{% endif %} contact-li" chat-id="chat_{{ thread.id }}" style="cursor: pointer">
                                     <div class="d-flex bd-highlight">
                                         <div class="img_cont">
-                                            <img src="{% if thread.first_person == user %}
-                                        {{ thread.second_person.image.url }}
-                                        {% else %}
-                                        {{ thread.first_person.image.url }}
-                                        {% endif %}" class="rounded-circle user_img">
+                                            <img src="{% if thread.first_person == user %}{{ thread.second_person.image.url }}{% else %}{{ thread.first_person.image.url }}{% endif %}"
+                                            class="rounded-circle user_img {% if thread.first_person == user %}thread_{{thread.id}}{% else %}thread_{{thread.id}}{% endif %}">
                                             <span class="online_icon"></span>
                                         </div>
                                         <div class="user_info">
@@ -109,13 +104,13 @@
                                                 <span class="msg_time_send">{{ chat.timestamp|date:"d D" }}, {{ chat.timestamp|time:"H:i" }}</span>
                                             </div>
                                             <div class="img_cont_msg">
-                                                <img src="" class="rounded-circle user_img_msg">
+                                                <img src="{{request.user.image.url}}" class="rounded-circle user_img_msg">
                                             </div>
                                         </div>
                                         {% else %}
                                         <div class="d-flex mb-4 received">
                                             <div class="img_cont_msg">
-                                                <img src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg" class="rounded-circle user_img_msg">
+                                                <img src="{{chat.user.image.url}}" class="rounded-circle user_img_msg">
                                             </div>
                                             <div class="msg_cotainer">
                                                 {{ chat.message }}

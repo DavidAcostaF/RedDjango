@@ -55,6 +55,7 @@ class ChatConsumer(AsyncConsumer):
         response = {
             'message':msg,
             'sent_by':self.user.id,
+            'image': self.user.image.url,
             'thread_id':thread_id
         }
         await self.channel_layer.group_send(

@@ -38,9 +38,10 @@ socket.onmessage = async function (e) {
     console.log('message', e)
     let data = JSON.parse(e.data)
     let message = data['message']
+    let image = data['image']
     let sent_by_id = data['sent_by']
     let thread_id = data['thread_id']
-    newMessage(message, sent_by_id, thread_id)
+    newMessage(message, sent_by_id, thread_id, image)
 }
 
 
@@ -52,7 +53,7 @@ socket.onclose = async function (e) {
 }
 
 
-function newMessage(message, sent_by_id, thread_id) {
+function newMessage(message, sent_by_id, thread_id, image) {
     if ($.trim(message) === '') {
         return false;
     }
@@ -66,17 +67,16 @@ function newMessage(message, sent_by_id, thread_id) {
 					<span class="msg_time_send">8:55 AM, Today</span>
 				</div>
 				<div class="img_cont_msg">
-					<img src="" class="rounded-circle user_img_msg">
+					<img src="${image}" class="rounded-circle user_img_msg">
 				</div>
 			</div>
 `
-
     }
     else {
         message_element = `
             <div class="d-flex mb-4 received">
                 <div class="img_cont_msg">
-                    <img src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg" class="rounded-circle user_img_msg">
+                    <img src="${image}" class="rounded-circle user_img_msg">
                 </div>
                 <div class="msg_cotainer">
                     ${message}
@@ -96,7 +96,7 @@ function newMessage(message, sent_by_id, thread_id) {
 }
 
 $('.contact-li').on('click', function () {
-    $('.contacts .actiive').removeClass('active')
+    $('.contacts .active').removeClass('active')
     $(this).addClass('active')
 
     // message wrappers
@@ -118,3 +118,8 @@ function get_active_thread_id() {
     let thread_id = chat_id.replace('chat_', '')
     return thread_id
 }
+$(document ).ready(function() {
+    let chat_id = $('.messages-wrapper.is_active').attr('chat-id')
+    let message_body = $('.messages-wrapper[chat-id="' + chat_id + '"] .msg_card_body')
+    $(message_body).scrollTop($(message_body).prop('scrollHeight') );
+  });
