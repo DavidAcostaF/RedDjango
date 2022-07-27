@@ -58,3 +58,19 @@ a{
     width: auto;
     margin-bottom: 15px;
 }
+
+
+
+.contenedor{
+    position: relative;
+    display: inline-block;
+    text-align: center;
+}
+
+.centrado{
+    position: absolute;
+    top: 106%;
+    left: 10%;
+    transform: translate(-50%, -50%);
+    color: #000;
+}

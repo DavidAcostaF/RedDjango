@@ -99,7 +99,7 @@ class FormularioUsuario(forms.ModelForm):
 class EditarUsuario(forms.ModelForm):
     class Meta:
         model = models.Usuario
-        fields = ['username','first_name','last_name','email','image']
+        fields = ['username','first_name','last_name','email','image','portada']
         labels = {
             'username':'Usuario',
             'first_name':'Nombres',
@@ -136,6 +136,12 @@ class EditarUsuario(forms.ModelForm):
                 attrs = {
                     'class':'form-control inputs',
                     'placeholder':'Imagen de perfil'
+                }
+            ),
+            'portada':forms.FileInput(
+                attrs = {
+                    'class':'form-control inputs',
+                    'placeholder':'Imagen de portada'
                 }
             ),
         }

@@ -36,8 +36,6 @@ class Inicio(LoginYSuperStaffMixins,ValidarPermisosMixins,ListView):
         paginator = Paginator(result_list,10)
         page = request.GET.get('page')
         result_list = paginator.get_page(page)
-        #comentarios = models.PostComentarios.objects.filter(post__in = result_list)
-        ##no se agrega por que no tiene relacion con el post el cual es con el que se filtra
         return render(request,self.template_name,{'object_list':result_list,'notificaciones':notificaciones}) 
 
 
@@ -56,7 +54,7 @@ class Posts(LoginYSuperStaffMixins,ValidarPermisosMixins,CreateView):
                 imagen = form.cleaned_data.get('imagen'),
                 disponible = form.cleaned_data.get('disponible')
             )
-        return HttpResponse(status = 204,headers={'HX-Redirect':''}) 
+        return HttpResponse(status = 204,headers={'HX-Redirect':'/'}) 
     # def get(self,request):
     #     queryset = self.model.objects.filter(estado = True)
     #     print(queryset)
@@ -211,8 +209,8 @@ class Comentarios(View):
     def post(self,request,pk):
         usuario = request.user
         comentario = request.POST.get('comentario')
+        print(comentario)
         post = models.Post.objects.get(id = pk)
-
         models.PostComentarios.objects.create(
             usuario = usuario,
             post = post,
@@ -241,6 +239,7 @@ class LikeComentario(View):
             post.like.add(usuario)
         return HttpResponse(status = 204)
 
+## no se utiliza
 class ContestarComentario(View):
     model = models.PostComentarios
 
@@ -268,14 +267,6 @@ class ListarComentarios(ListView):
         return HttpResponse(serialize('json', comentarios,use_natural_foreign_keys = True), 'application/json')        
 
 class EliminarNotificacion(View):
-    # model = models.Post
-    # template_name = 'posts/post_detalle.html'
-
-    # def get(self,request,*args,**kwargs):
-    #     if self.get_object():
-    #         return render(request,self.template_name,{'object':self.get_object})
-    #     return redirect('index')
-
     def post(self,requst,pk):
         notificacion = models.Notificaciones.objects.get(id = pk)
         notificacion.delete()

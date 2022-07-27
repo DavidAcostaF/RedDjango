@@ -6,8 +6,9 @@
 
 {%block info%}
 {%if usuario.portada %}
-<div class="d-flex justify-content-center">
-    <img src="{{usuario.portada.url}}" style="width: 50vw; height: 300px;">
+<div class="d-flex justify-content-center contenedor">
+    <img src="{{usuario.portada.url}}" style="width: 70vw; height: 500px;">
+    <div class="centrado"><img src="{{usuario.image.url}}" style="border-radius: 15px; height:35px;width:35px">{{usuario}}</div>
 </div>
 <br>
 <!-- <div class="card bg-dark text-white">
@@ -19,9 +20,9 @@
     </div>
   </div> -->
 {% else %}
-<div class="d-flex justify-content-center">
-    <img src="https://josefacchin.com/wp-content/uploads/2020/02/como-quitar-el-fondo-de-una-imagen.png"
-        style="width: 70vw; height: 500px;">
+<div class="d-flex justify-content-center contenedor">
+        <div style="width: 70vw; height: 500px; background: #292929; box-shadow: 5px;"></div>
+        <div class="centrado"><img src="{{usuario.image.url}}" style="border-radius: 15px; height:35px;width:35px">{{usuario}}</div>
 </div>
 {%endif%}
 {%endblock info%}
@@ -31,28 +32,26 @@
 {%else%}
 {%if amigos%}
 <div>
-    <form action="" method="post">{%csrf_token%}
+    <form action="" method="post" style="float: right;">{%csrf_token%}
         <button type="submit" class="btn btn-danger">No Seguir</button>
     </form>
 </div>
 {%else%}
 <div>
-    <form action="" method="post">{%csrf_token%}
+    <form action="" method="post" style="float: right;">{%csrf_token%}
         <button type="submit" class="btn btn-success">Seguir Usuario</button>
     </form>
 </div>
 {%endif%}
 {%endif%}
 {%if usuario == request.user%}
-<div class="container"><img
-        src="{%if usuario.image %}{{usuario.image.url}}{% else %}{%static 'img/default.png'%}{%endif%}"
+<div class="container">
+    <img src="{%if usuario.image %}{{usuario.image.url}}{% else %}{%static 'img/default.png'%}{%endif%}"
         style="height:35px;width: 35px; border-radius: 15px; margin-left: 32.9%;">
-    <button class="joinBtn" hx-get="{% url 'posts:crear_posts' %}" hx-target="#dialog">Crear
-        Publicacion</button>
+    <button class="joinBtn" hx-get="{% url 'posts:crear_posts' %}" hx-target="#dialog">Crear Publicacion</button>
 </div><br>
 {%endif%}
-<div class="d-flex justify-content-left">
-
+<!-- <div class="d-flex justify-content-left">
     <div class="card mb-3">
         <div class="card-body">
             <h5 class="card-title">Fotos</h5>
@@ -63,24 +62,12 @@
             {%endfor%}
         </div>
     </div>
-</div>
-<!-- CREAR PUBLICACIONES -->
-<!-- <div class="card">
-    <div class="card-header">
-        <div class="row">
-            <strong class="card-title">Crear Posts</strong>
-            <div class="col-md-4">
-                <button type="button" class="btn btn-primary" hx-get="{% url 'posts:crear_posts' %}"
-                    hx-target="#dialog">REGISTRAR LIBRO</button>
-            </div>
-        </div>
-    </div>
-</div>
-<br> -->
+</div> -->
+
 
 {%for publicacion in object_list%}
 
-<div class="d-flex justify-content-center " style="position:relative; bottom:70px; right: 30px; margin-bottom: 20px;">
+<div class="d-flex justify-content-center " style="margin-bottom: 20px;">
     <div class="card" style="width: 34rem;">
         <div class="card-body">
             <h5 class="card-title"><a

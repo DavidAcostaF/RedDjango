@@ -7,12 +7,12 @@
 {% csrf_token %}
 {%block body%}
 
-<div class="container"><a href="{%url 'usuarios:muro' request.user.first_name request.user.last_name%}"><img
-            src="{{request.user.image.url}}"
-            style="height:35px;width: 35px; border-radius: 15px; margin-left: 34.7%;"></a>
-    <button class="joinBtn" hx-get="{% url 'posts:crear_posts' %}" hx-target="#dialog">Crear
-        Publicacion</button>
-</div><br>
+<div class="container">
+    <a href="{%url 'usuarios:muro' request.user.first_name request.user.last_name%}">
+        <img src="{{request.user.image.url}}" style="height:35px;width: 35px; border-radius: 15px; margin-left: 34.7%;"></a>
+        <button class="joinBtn" hx-get="{% url 'posts:crear_posts' %}" hx-target="#dialog">Crear Publicacion</button>
+</div>
+<br>
 {%if object_list%}
 {%for publicacion in object_list%}
 <div class="d-flex justify-content-center">
@@ -87,22 +87,24 @@
                             class="fa-solid fa-thumbs-up"></i><button type="submit" class="si"
                             id="like_{{publicacion.id}}"
                             style="{% if request.user in publicacion.like.all %}background:blue; color:white;{%endif%}"
+
                             onclick="AddLike({{publicacion.id}})">Like</button></form>
                     <form action="{%url 'posts:dislike' publicacion.id%}" method="post"> {% csrf_token %}<i
                             class="fa-solid fa-thumbs-down"></i><button type="submit" class="si"
                             id="dislike_{{publicacion.id}}"
                             style="{% if request.user in publicacion.dislike.all %}background:red; color:white;{%endif%}"
                             onclick="AddDislike({{publicacion.id}})">Dislike</button></form>
+
                     <button class="si" {% comment %} onclick="mostrarComentarios({{publicacion.id}})"{% endcomment %} onclick="comentarios({{publicacion.id}})">Comentar</button> 
                     <button class="si" hx-get="{% url 'posts:compartir_post' publicacion.id%}"
                         hx-target="#dialog">Compartir</button>
                 </div>
-                    <form action="{%url 'posts:comentar' publicacion.id%}" method="post" id="comentar_{{publicacion.id}}" style="display:none;margin-bottom: 10px;"> {% csrf_token %}<img src="{{request.user.image.url}}" style="height:35px;width: 35px; border-radius: 15px;"><input
-                        style="width: 500px;display:inline-block;border-radius:15px " type="text" class="form-control" name="comentario"
-                        placeholder="Escribe un comentario público...">
-                    </form>
+                    <form action="{%url 'posts:comentar' publicacion.id%}" method="post" id="comentar_{{publicacion.id}}" style="display:none;margin-bottom: 10px;" onsubmit="comentarPost({{publicacion.id}},'{{request.user.image.url}}','{{request.user}}')">{% csrf_token %}
+                        <img src="{{request.user.image.url}}" style="height:35px;width: 35px; border-radius: 15px;">
+                        <input style="width: 500px;display:inline-block;border-radius:15px " type="text" class="form-control" name="comentario" 
+                        placeholder="Escribe un comentario público..."></form>
                 <div class="comentarios" id="comentarios_{{publicacion.id}}" style="display:none;">
-                    </div>
+                </div>
             </div>
         </div>
         <br>
@@ -114,7 +116,7 @@
 <h1>Crea un post o sigue un usuario</h1>
 {% endif%}
 
-<div style="" class="d-flex justify-content-center">
+<div class="d-flex justify-content-center">
     <div>
         {% if object_list.has_previous%}
         <div class='clearfix'>
@@ -141,7 +143,7 @@
 {%for notificacion in notificaciones%}
 
 {%if notificacion.accion == 0%}
-<form action="{%url 'posts:post_detalle' notificacion.id%}" method="post"> {% csrf_token %}
+<form action="{%url 'posts:post_detalle' notificacion.id%}" method="post" id="notificacion_{{notificacion.id}}"> {% csrf_token %}
 <a class="dropdown-item d-flex align-items-center" href="#">
     <div class="mr-3">
         <div class="icon-circle bg-warning">
@@ -158,16 +160,15 @@
 
 {%endif%}
 {%if notificacion.accion == 1%}
-<form action="{%url 'posts:post_detalle' notificacion.id%}" method="post">{% csrf_token %}
-<a class="dropdown-item d-flex align-items-center" href="" >
+<form action="{%url 'posts:post_detalle' notificacion.id%}" method="post" id="notificacion_{{notificacion.id}}">{% csrf_token %}
+<a class="dropdown-item d-flex align-items-center" id="notificacion_{{notificacion.id}}">
     <div class="mr-3">
         <div class="icon-circle bg-success">
             <i class="fas fa-donate text-white"></i>
         </div>
     </div>
-    <!-- id="notificacion_{{notificacion.id}}" -->
     <div>
-    <div class="small text-gray-500">{{notificacion.fecha_creacion}}</div>
+        <div class="small text-gray-500">{{notificacion.fecha_creacion}}</div>
         Al usuario: {{notificacion.user}} le gusta tu publicacion {{notificacion.post.contenido}}
         <button type="submit" class="btn btn-danger btn-sm"  style="float: right;" onclick="eliminarNotificacion({{notificacion.id}})">&times;</button>
     </div>
@@ -175,7 +176,7 @@
 </form>
 {%endif%}
 {%if notificacion.accion == 2%}
-<form action="{%url 'posts:post_detalle' notificacion.id%}" method="post"> {% csrf_token %}
+<form action="{%url 'posts:post_detalle' notificacion.id%}" method="post" id="notificacion_{{notificacion.id}}"> {% csrf_token %}
 <a class="dropdown-item d-flex align-items-center" href="#">
     <div class="mr-3">
         <div class="icon-circle bg-warning">

@@ -1,5 +1,6 @@
 from itertools import chain
 from operator import add
+from traceback import print_tb
 from turtle import update
 from django.views.generic import TemplateView,CreateView,ListView,DeleteView,UpdateView,View,DetailView
 from django.urls import reverse_lazy
@@ -60,6 +61,7 @@ class CrearUsuario(CreateView):
             nuevo_usuario.save()
             return redirect('login')
         else:
+            print(form.errors)
             return redirect('register')
 
 class ListarUsuarios(ListView):
